@@ -11,7 +11,7 @@ class User < ApplicationRecord
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true                            # 一意性の検証 他に同じデータがない
   has_secure_password                        # パスワードハッシュ化
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true  #編集時 パスワードはスルーして更新
  
   
   # 渡された文字列のハッシュ値を返します。
