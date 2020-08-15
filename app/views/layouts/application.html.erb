@@ -15,7 +15,7 @@
     <%= render 'layouts/header' %>
     <div class="container">
       <% flash.each do |message_type, msg| %>      <!-- flashのキーが存在するか判定 flashというオブジェクトを対象にハッシュのキーとバリューを繰り返し処理-->
-        <div class="alert alert-<%= message_type %>"><%= msg %></div>  <!-- 処理の中ではCSSのクラスが動的に変化するよう記述 -->
+        <div class="alert alert-<%= message_type %>"><%= msg.html_safe %></div>  <!-- 処理の中ではCSSのクラスが動的に変化するよう記述 -->
       <% end %>
       <%= yield %>
       <%= debug(params) if Rails.env.development? %>

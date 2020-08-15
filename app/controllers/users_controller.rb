@@ -1,73 +1,80 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]         # @userをセットする
-  before_action :logged_in_user, only: [:index, :show, :edit, :update, :destroy]   # ログインを要求
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]        # @userをセットする
+  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]   # ログインを要求
   before_action :correct_user, only: [:edit, :update]            # 正しいユーザーであることを要求 ユーザー自身のみが情報を編集・更新できる
-  before_action :admin_user, only: :destroy                      # 管理者のみ削除
+  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]       # 管理者のみ削除
 
 
   def index
-    @users = User.paginate(page: params[:page])  # 全てのユーザーを代入した複数形 ページネーションを挿入 デフォルトでは30件
+    @users = User.paginate(page: params[:page])
   end
-  
-  
+
   def show
-    @user = User.find(params[:id])  # ユーザーのidの取得
   end
 
   def new
     @user = User.new
   end
-  
-  def create                        # フォームの送信を受け取る
+
+  def create
     @user = User.new(user_params)
     if @user.save
-      log_in @user      # 保存成功後、ログインします。ユーザー登録と同時にログインする
+      log_in @user
       flash[:success] = '新規作成に成功しました。'
-      redirect_to @user # 保存に成功した場合は、ここに記述した処理が実行されます。
+      redirect_to @user
     else
       render :new
     end
   end
-  
-  
+
   def edit
-    @user = User.find(params[:id])
   end
-  
-  
+
   def update
-    @user = User.find(params[:id])
-    if @user.update_attributes(user_params)  # 更新処理となるのでupdate_attributes
+    if @user.update_attributes(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
       redirect_to @user
     else
       render :edit      
     end
   end
-  
-  
+
   def destroy
     @user.destroy
     flash[:success] = "#{@user.name}のデータを削除しました。"
     redirect_to users_url
   end
-  
-  
+
+  def edit_basic_info
+  end
+
+
+  def update_basic_info
+    if @user.update_attributes(basic_info_params)
+      flash[:success] = "#{@user.name}の基本情報を更新しました。"
+    else
+      flash[:danger] = "#{@user.name}の更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
+    end
+    redirect_to users_url
+  end
+
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
     end
-    
-    
-    # beforeフィルター
 
+    # beforeフィルター
 
     # paramsハッシュからユーザーを取得します。
     def set_user
       @user = User.find(params[:id])
     end
     
+    
+    def basic_info_params
+      params.require(:user).permit(:department, :basic_time, :work_time)
+    end
 
     # ログイン済みのユーザーか確認します。
     def logged_in_user
@@ -77,18 +84,15 @@ class UsersController < ApplicationController
         redirect_to login_url
       end
     end
-    
-    
+
     # アクセスしたユーザーが現在ログインしているユーザーか確認します。
     def correct_user
-      # @user = User.find(params[:id])    # アクセスしたユーザーを判定するためidのユーザーオブジェクトが必要
-      # # 指定したユーザーオブジェクトが、現在ログイン中のユーザーであるか
       redirect_to(root_url) unless current_user?(@user)
     end
-    
-    
+
     # システム管理権限所有かどうか判定します。
     def admin_user
       redirect_to root_url unless current_user.admin?
     end
 end
+

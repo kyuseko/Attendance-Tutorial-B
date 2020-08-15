@@ -10,6 +10,9 @@ class User < ApplicationRecord
   validates :email, presence: true, length: { maximum: 100 },
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true                            # 一意性の検証 他に同じデータがない
+  validates :department, length: { in: 2..30 }, allow_blank: true   # 値が空文字""の場合バリデーションをスルー
+  validates :basic_time, presence: true
+  validates :work_time, presence: true
   has_secure_password                        # パスワードハッシュ化
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true  #編集時 パスワードはスルーして更新
  
