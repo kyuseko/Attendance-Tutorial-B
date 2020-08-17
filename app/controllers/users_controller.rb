@@ -3,13 +3,15 @@ class UsersController < ApplicationController
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]   # ログインを要求
   before_action :correct_user, only: [:edit, :update]            # 正しいユーザーであることを要求 ユーザー自身のみが情報を編集・更新できる
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]       # 管理者のみ削除
+  before_action :set_one_month, only: :show
 
 
   def index
     @users = User.paginate(page: params[:page])
   end
 
-  def show
+  def show 
+   @worked_sum = @attendances.where.not(started_at: nil).count  # 出勤日数を表示
   end
 
   def new
@@ -63,6 +65,11 @@ class UsersController < ApplicationController
     def user_params
       params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
     end
+    
+    
+    def basic_info_params
+      params.require(:user).permit(:department, :basic_time, :work_time)
+    end
 
     # beforeフィルター
 
@@ -71,10 +78,6 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
     end
     
-    
-    def basic_info_params
-      params.require(:user).permit(:department, :basic_time, :work_time)
-    end
 
     # ログイン済みのユーザーか確認します。
     def logged_in_user
