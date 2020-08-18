@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]   # ログインを要求
   before_action :correct_user, only: [:edit, :update]            # 正しいユーザーであることを要求 ユーザー自身のみが情報を編集・更新できる
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]       # 管理者のみ削除
-  before_action :set_one_month, only: :show
+  before_action :set_one_month, only: :show  # # ページ出力前に1ヶ月分のデータの存在を確認・セットします。1ヶ月分のデータが無い状態を防ぐ
 
 
   def index
@@ -59,43 +59,5 @@ class UsersController < ApplicationController
     end
     redirect_to users_url
   end
-
-  private
-
-    def user_params
-      params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
-    end
-    
-    
-    def basic_info_params
-      params.require(:user).permit(:department, :basic_time, :work_time)
-    end
-
-    # beforeフィルター
-
-    # paramsハッシュからユーザーを取得します。
-    def set_user
-      @user = User.find(params[:id])
-    end
-    
-
-    # ログイン済みのユーザーか確認します。
-    def logged_in_user
-      unless logged_in?
-        store_location
-        flash[:danger] = "ログインしてください。"
-        redirect_to login_url
-      end
-    end
-
-    # アクセスしたユーザーが現在ログインしているユーザーか確認します。
-    def correct_user
-      redirect_to(root_url) unless current_user?(@user)
-    end
-
-    # システム管理権限所有かどうか判定します。
-    def admin_user
-      redirect_to root_url unless current_user.admin?
-    end
 end
 
