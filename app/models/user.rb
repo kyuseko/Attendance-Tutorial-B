@@ -55,4 +55,13 @@ class User < ApplicationRecord
   def forget
     update_attribute(:remember_digest, nil)
   end
+  
+  
+  def self.search(search)  # メソッドはコントローラから呼び出すもの
+      if search
+        where(['name LIKE ?', "%#{search}%"])  # 文字列を検索 Userテーブルのカラム(name)から(LIKE)、検索ワード(search)にかする文字列はないか見ている
+      else
+        all  # 検索ワードが無い場合に、Userテーブルから全てのレコードを返す
+      end
+  end
 end

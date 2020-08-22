@@ -7,12 +7,15 @@ class UsersController < ApplicationController
 
 
   def index
-    @users = User.paginate(page: params[:page])
+    @users = User.paginate(page: params[:page])  # ページネーション
+    if params[:search].present?
+      @users = @users.search(params[:search])
+    end 
   end
 
   def show 
    @worked_sum = @attendances.where.not(started_at: nil).count  # 出勤日数を表示
-  end
+  end  # 1ヶ月分の勤怠データの中で、出勤時間が何も無い状態では無いものの数を代入
 
   def new
     @user = User.new
@@ -59,5 +62,7 @@ class UsersController < ApplicationController
     end
     redirect_to users_url
   end
+  
+  
 end
 

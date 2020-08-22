@@ -17,11 +17,12 @@
     <tbody>
       <% @attendances.each do |day| %>
         <%= f.fields_for "attendances[]", day do |attendance| %> <!-- Userモデルに紐づいたAttendanceモデルの編集、更新 fields_for-->
+        
         <tr>
           <td><%= l(day.worked_on, format: :short) %></td>
           <td><%= $days_of_the_week[day.worked_on.wday] %></td>
           <% if !current_user.admin? && (Date.current < day.worked_on) %>  <!-- 「管理権限者では無いこと、かつ勤怠オブジェクトが当日から判断して翌日以降」それ以外で -->
-            <td><%= attendance.time_field :started_at, readonly: true, class: "form-control" %></td>  <!-- 一般ユーザー -->
+            <td><%= attendance.time_field :started_at, readonly: true, class: "form-control" %></td>
             <td><%= attendance.time_field :finished_at, readonly: true, class: "form-control" %></td>
           <% else %>
             <td><%= attendance.time_field :started_at, class: "form-control" %></td>
