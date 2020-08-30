@@ -4,6 +4,7 @@ class UsersController < ApplicationController
   before_action :correct_user, only: [:edit, :update]            # 正しいユーザーであることを要求 ユーザー自身のみが情報を編集・更新できる
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]       # 管理者のみ削除
   before_action :set_one_month, only: :show  # # ページ出力前に1ヶ月分のデータの存在を確認・セットします。1ヶ月分のデータが無い状態を防ぐ
+  before_action :admin_or_correct_user, only: :show
 
 
   def index
@@ -15,7 +16,7 @@ class UsersController < ApplicationController
 
   def show 
    @worked_sum = @attendances.where.not(started_at: nil).count  # 出勤日数を表示
-  end  # 1ヶ月分の勤怠データの中で、出勤時間が何も無い状態では無いものの数を代入
+  end
 
   def new
     @user = User.new

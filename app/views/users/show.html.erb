@@ -55,7 +55,7 @@
           css_class = 
           case %w{日 月 火 水 木 金 土}[day.worked_on.wday]
           when '土'
-            'text-primary'
+            'text-prima ry'
           when '日'
             'text-danger'
           end
@@ -70,8 +70,8 @@
               <%= link_to "#{btn_text}登録", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" %>
             <% end %>
           </td>
-          <td></td>
-          <td></td>
+          <td><%= format_hour(day.finished_at) if day.finished_at.present? %></td>
+          <td><%= format_min(day.finished_at) if day.finished_at.present? %></td>
           <td></td>
           <td>
             <% if day.started_at.present? && day.finished_at.present? %>
@@ -83,7 +83,7 @@
         </tr>
       <% end %>
     <tr>
-      <td colspan="2"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
+      <td colspan="2"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td> <!-- to_fメソッドにより変換した値を足している -->
       <td colspan="6"></td>
       <td><%= format("%.2f", @total_working_times.to_f) %></td>
       <td></td>

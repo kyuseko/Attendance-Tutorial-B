@@ -37,14 +37,18 @@ class AttendancesController < ApplicationController
     ActiveRecord::Base.transaction do # トランザクションを開始します。
       attendances_params.each do |id, item|
         attendance = Attendance.find(id)     # idを使って更新対象となるオブジェクトを変数に代入
+        if item[:started_at].present? && item[:finished_at].blank?
+          flash[:danger] = "退社時間を入力して下さい。"
+          redirect_to attendances_edit_one_month_user_url(date: params[:date]) and return
+        end 
         attendance.update_attributes!(item)  # update_attributesメソッドの引数にitemを指定し、オブジェクトの情報を更新
-      end                                    # !はfalseでは無く例外処理を返します
+      end
     end
     flash[:success] = "1ヶ月分の勤怠情報を更新しました。"  # 全ての繰り返し処理が成功の場合
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
     flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
-    redirect_to attendances_edit_one_month_user_url(date: params[:date])
+    redirect_to attendances_edit_one_month_user_url(date: params[:date]) and return
   end
 
 
@@ -57,12 +61,5 @@ class AttendancesController < ApplicationController
     
     # beforeフィルター
 
-    # 管理権限者、または現在ログインしているユーザーを許可します。
-    def admin_or_correct_user
-      @user = User.find(params[:user_id]) if @user.blank?
-      unless current_user?(@user) || current_user.admin?  # どちらかの条件式がtrueか、どちらもtrueの時には何も実行されない処理
-        flash[:danger] = "編集権限がありません。"
-        redirect_to(root_url)
-      end  
-    end
-end
+    
+end 
